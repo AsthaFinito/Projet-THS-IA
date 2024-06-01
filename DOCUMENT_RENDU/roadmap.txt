@@ -1,0 +1,5 @@
+Première etape :
+
+        J'ai commenter et compris le code python , je teste de fft tous les .wav fournit pour voir comment cela fonctionne
+        (commande pour lancer : python fftSon.py NOM_FICHIER.wav)
+        J'ai modifier le fichier pour que ce soit simple de multiplier la frequence du signal mais je ne vois pas de différence majeurs
