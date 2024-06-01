@@ -5,6 +5,8 @@ public class testNeurone
 		// Tableau des entrées de la fonction ET (0 = faux, 1 = vrai)
 		final float[][] entrees = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
 		
+		// Tableau des entrées de la fonction OU (0 = faux, 1 = vrai)
+		//float[][] entreesOU = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
 		// Tableau des sorties de la fonction ET
 		final float[] resultats = {0, 0, 0, 1};
 		
