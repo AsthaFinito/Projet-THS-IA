@@ -67,7 +67,8 @@ public abstract class Neurone implements iNeurone
 	public int apprentissage(final float[][] entrees, final float[] resultats)
 {
     int compteurEchecs = 0;
-    
+    final int maxIterations = 100000; //anti boucle infinie
+	int iteration = 0;
     // Un "drapeau" indiquant si toutes les entrées ont permis de trouver
     // les résultats attendus (=> l'apprentissage est alors fini), ou s'il
     // y a au moins un cas qui ne correspond pas (=> apprentissage pas fini)
@@ -82,7 +83,7 @@ public abstract class Neurone implements iNeurone
         // Pour chacune des entrées fournies
         for (int i = 0; i < entrees.length; ++i)
         {
-			System.err.println("Entre, i = " + i);
+			//System.err.println("Entre, i = " + i);
             final float[] entree = entrees[i];
             final float resultatAttendu = resultats[i]; // Récupération du résultat attendu
             // On calcule la sortie du neurone en fonction de ces entrées
@@ -93,22 +94,14 @@ public abstract class Neurone implements iNeurone
             // Si l'erreur absolue dépasse la tolérance autorisée 
             if(erreur>ToleranceSortie){
                 // On met à jour les poids synaptiques
-                for (int j = 0; j < synapses().length; ++j){ //Je réutilisse la boucle vu dans metAJoue 
-                    
-                    //Explication de la ligne suivante : 
-                        //On souhaite une modification proportionnel donc j'accede au poids synaptiques d'indice j (synapses() est une méthode ,[j] acces au bonne indice)
-                        //eta -> coeff de maj des poids , donné par les profs
-                        // erreur -> l'erreur calculé juste avant
-                        //entree[j] la valeur actuelle pour l'apprentissage
-                    synapses()[j] += eta * erreur * entree[j];
-					// On met aussi à jour le biais en utilisant la même méthode 
-					//biais() -> biais actulle
-					//eta * erreur -> ajout à faire au biais pour modifier l'apprentissage
-					fixeBiais(biais() + eta * erreur);
-					// Et on mémorise que l'apprentissage n'est pas finalisé
-					apprentissageFini = false;
-					compteurEchecs += 1;
-                }
+				for (int j = 0; j < synapses().length; ++j) {
+					synapses()[j] += eta * erreur * entree[j];
+				}
+				// On met aussi à jour le biais
+				fixeBiais(biais() + eta * erreur);
+				// Et on mémorise que l'apprentissage n'est pas finalisé
+				apprentissageFini = false;
+				compteurEchecs++;
                 
                 
             }
@@ -116,6 +109,14 @@ public abstract class Neurone implements iNeurone
             
                 
         }
+		iteration++;
+		if (iteration >= maxIterations) {
+            System.out.println("Limite maximale d'itérations atteinte.");
+            break;
+        }
+		else{
+			System.out.println("itération : "+iteration);
+		}
     }
     while (!apprentissageFini);
     return compteurEchecs;

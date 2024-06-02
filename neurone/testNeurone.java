@@ -9,16 +9,17 @@ public class testNeurone
 		//float[][] entreesOU = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
 		// Tableau des sorties de la fonction ET
 		final float[] resultats = {0, 0, 0, 1};
-		
+		System.out.println("Initialisation des tableaux");
 		// On crée un neurone taillé pour apprendre la fonction ET
 		final iNeurone n = new NeuroneHeaviside(entrees[0].length);
+		System.out.println("Neurone iNeurone ok");
 		//final iNeurone n = new NeuroneSigmoide(entrees[0].length);
 		//final iNeurone n = new NeuroneReLU(entrees[0].length);
 		
 		System.out.println("Apprentissage…");
 		// On lance l'apprentissage de la fonction ET sur ce neurone
 		System.out.println("Nombre de tours : "+n.apprentissage(entrees, resultats));
-		
+		System.out.println("Apprentissage fini");
 		// On affiche les valeurs des synapses et du biais
 
 		// Conversion dynamique d'une référence iNeurone vers une référence neurone.
