@@ -65,60 +65,49 @@ public abstract class Neurone implements iNeurone
 	// Fonction d'apprentissage permettant de mettre à jour les valeurs des 
 	// poids synaptiques ainsi que du biais en fonction de données supervisées
 	public int apprentissage(final float[][] entrees, final float[] resultats)
-{
-    int compteurEchecs = 0;
-    final int maxIterations = 100000; //anti boucle infinie
-	int iteration = 0;
-    // Un "drapeau" indiquant si toutes les entrées ont permis de trouver
-    // les résultats attendus (=> l'apprentissage est alors fini), ou s'il
-    // y a au moins un cas qui ne correspond pas (=> apprentissage pas fini)
-    boolean apprentissageFini = true;
-
-    // On boucle jusqu'à ce que l'apprentissage soit fini
-    do
     {
-        // On part du principe que tout va bien se passer => drapeau à vrai
-        apprentissageFini = true;
+        int compteurEchecs = 0;
 
-        // Pour chacune des entrées fournies
-        for (int i = 0; i < entrees.length; ++i)
+        // Un "drapeau" indiquant si toutes les entrées ont permis de trouver
+        // les résultats attendus (=> l'apprentissage est alors fini), ou s'il
+        // y a au moins un cas qui ne correspond pas (=> apprentissage pas fini)
+        boolean apprentissageFini = true;
+
+        // On boucle jusqu'à ce que l'apprentissage soit fini
+        do
         {
-			//System.err.println("Entre, i = " + i);
-            final float[] entree = entrees[i];
-            final float resultatAttendu = resultats[i]; // Récupération du résultat attendu
-            // On calcule la sortie du neurone en fonction de ces entrées
-            metAJour(entree);
-            
-            // On regarde la différence avec le résultat attendu
-            float erreur = Math.abs(resultatAttendu - sortie()); // Calcul de la différence
-            // Si l'erreur absolue dépasse la tolérance autorisée 
-            if(erreur>ToleranceSortie){
-                // On met à jour les poids synaptiques
-				for (int j = 0; j < synapses().length; ++j) {
-					synapses()[j] += eta * erreur * entree[j];
-				}
-				// On met aussi à jour le biais
-				fixeBiais(biais() + eta * erreur);
-				// Et on mémorise que l'apprentissage n'est pas finalisé
-				apprentissageFini = false;
-				compteurEchecs++;
-                
-                
+            // On part du principe que tout va bien se passer => drapeau à vrai
+            apprentissageFini = true;
+
+            // Pour chacune des entrées fournies
+            for (int i = 0; i < entrees.length; ++i)
+            {
+                final float[] entree = entrees[i];
+
+                // On calcule la sortie du neurone en fonction de ces entrées
+                metAJour(entree);
+                // On regarde la différence avec le résultat attendu
+                float erreur = resultats[i] - sortie();
+
+                // Si l'erreur absolue dépasse la tolérance autorisée
+                if (Math.abs(erreur) > ToleranceSortie) 
+                {
+                    // On met à jour les poids synaptiques
+                    for (int j = 0; j < synapses().length; ++j) {
+                        synapses()[j] += eta * erreur * entree[j];
+                    }
+
+                    // On met aussi à jour le biais
+                    fixeBiais(biais() + eta * erreur);
+
+                    // Et on mémorise que l'apprentissage n'est pas finalisé
+                    apprentissageFini = false;
+                    compteurEchecs += 1;
+                }
             }
-                
-            
-                
         }
-		iteration++;
-		if (iteration >= maxIterations) {
-            System.out.println("Limite maximale d'itérations atteinte.");
-            break;
-        }
-		else{
-			System.out.println("itération : "+iteration);
-		}
+        while (!apprentissageFini);
+        return compteurEchecs;
     }
-    while (!apprentissageFini);
-    return compteurEchecs;
-}
+
 }
