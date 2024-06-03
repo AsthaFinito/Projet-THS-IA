@@ -25,3 +25,5 @@ Remarque pour les entrés bruités , le neurone n'est pas trs precis par exemple
         [0.15,-0.99] il nous sort 0 alors que c'est plus 1 normalement avec la table OU
 J'ai modifié le code pour tester X fois avec des valeurs bruitées et pourvoir avoir une idée de la robustesse du code
         La précision oscielle entre 0.75 et 1 donc entre 75% et 100%
+Pour avoir ensuite testé avec la fonction d'activiation sigmoid , on tourne entre 0.75 de ration donc 75%
+C'est mieux qu'un pile ou face mais je pense que l'on peut l'améliorer
