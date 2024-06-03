@@ -3,3 +3,25 @@ Première etape :
         J'ai commenter et compris le code python , je teste de fft tous les .wav fournit pour voir comment cela fonctionne
         (commande pour lancer : python fftSon.py NOM_FICHIER.wav)
         J'ai modifier le fichier pour que ce soit simple de multiplier la frequence du signal mais je ne vois pas de différence majeurs
+
+
+
+
+Passage aux codes java :
+
+• tester plusieurs fois, et faire des statistiques sur les valeurs des poids
+trouvées : ces valeurs sont-elles similaires ? Pouvez-vous le justifier ?
+
+        La première chose que l'on note lorsque on lance plusieurs fois le programme est que 
+        le nombre de tours n'est jamais le meme (première itération 14 , deuxième 35 ect...)
+        Les synapses sont toujours compris entre 0 et 1 et le biais toujours entre -1 et 0
+        Ces valeurs sont similaires. POur justifier ces résultats je pense que vu que l'on fournit des valeurs entre 0 et 1 , cela me parait 
+        cohérent d'avoir des valeurs également comprise entre 0 et 1 . Pour le biais je n'ai pas de justification au fait qu'il 
+        soit toujours négatif.
+
+Pour coder le OU , on change juste les résultats attendus par {0,1,1,1}
+
+Remarque pour les entrés bruités , le neurone n'est pas trs precis par exemple , en entrée
+        [0.15,-0.99] il nous sort 0 alors que c'est plus 1 normalement avec la table OU
+J'ai modifié le code pour tester X fois avec des valeurs bruitées et pourvoir avoir une idée de la robustesse du code
+        La précision oscielle entre 0.75 et 1 donc entre 75% et 100%
