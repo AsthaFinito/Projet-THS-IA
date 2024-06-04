@@ -1,7 +1,7 @@
 class FFTCplx
 {
 	public final static int TailleFFTtest = 16;
-	public final static double Periode = 1;
+	public final static double Periode = 3;
 
 // 	private int taille;
 // 

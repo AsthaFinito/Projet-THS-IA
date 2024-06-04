@@ -1,3 +1,8 @@
+https://docs.google.com/document/d/1lrpyABX2LmY0-C31zXa3DqX1J6VJjEGgzigvkX-ZAR8/edit?usp=sharing
+RENDU POUR VALENTIN ET THOMAS PAS TOUCHE LES 3ARBIS
+
+
+
 Première etape :
 
         J'ai commenter et compris le code python , je teste de fft tous les .wav fournit pour voir comment cela fonctionne
@@ -27,3 +32,7 @@ J'ai modifié le code pour tester X fois avec des valeurs bruitées et pourvoir 
         La précision oscielle entre 0.75 et 1 donc entre 75% et 100%
 Pour avoir ensuite testé avec la fonction d'activiation sigmoid , on tourne entre 0.75 de ration donc 75%
 C'est mieux qu'un pile ou face mais je pense que l'on peut l'améliorer
+
+
+Etude du code Son.java :
+        commande pour utiliser ->  java .\Son\Son.java '.\Sources sonores\Bruit.wav'  
