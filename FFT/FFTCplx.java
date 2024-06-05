@@ -1,7 +1,7 @@
 class FFTCplx
 {
 	public final static int TailleFFTtest = 16;
-	public final static double Periode = 1;
+	public final static double Periode = 3;
 
 // 	private int taille;
 // 
@@ -48,7 +48,7 @@ class FFTCplx
 		// Création d'un signal test simple
 		Complexe[] signalTest = new Complexe[TailleFFTtest];
 		for (int i = 0; i < TailleFFTtest; ++i)
-			signalTest[i] = new ComplexeCartesien(0, Math.cos(2.*Math.PI*i/TailleFFTtest*Periode));
+			signalTest[i] = new ComplexeCartesien(0, Math.sin(2.*Math.PI*i/TailleFFTtest*Periode));
 		// On applique la FFT sur ce signal
 		Complexe[] resultat = appliqueSur(signalTest);
 		// On affiche les valeurs du résultat
