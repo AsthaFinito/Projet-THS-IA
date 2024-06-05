@@ -36,3 +36,4 @@ C'est mieux qu'un pile ou face mais je pense que l'on peut l'améliorer
 
 Etude du code Son.java :
         commande pour utiliser ->  java .\Son\Son.java '.\Sources sonores\Bruit.wav'  
+        java .\Son\DetecteurSon.java  '.\Sources sonores\Bruit.wav'

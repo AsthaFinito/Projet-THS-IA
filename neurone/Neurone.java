@@ -92,6 +92,7 @@ public abstract class Neurone implements iNeurone
                 // Si l'erreur absolue dépasse la tolérance autorisée
                 if (Math.abs(erreur) > ToleranceSortie) 
                 {
+					
                     // On met à jour les poids synaptiques
                     for (int j = 0; j < synapses().length; ++j) {
                         synapses()[j] += eta * erreur * entree[j];

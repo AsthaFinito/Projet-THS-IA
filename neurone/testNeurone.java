@@ -4,14 +4,15 @@ public class testNeurone
 {
 	public static void main(String[] args)
 	{
+		final int numTests = 100; // Nombre de tours de test pour l'apprentissage
 		// Tableau des entrées de la fonction ET (0 = faux, 1 = vrai)
-		//final float[][] entrees = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
+		final float[][] entrees = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
 		
 		// Tableau des entrées de la fonction OU (0 = faux, 1 = vrai)
-		float[][] entrees= {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
+		//float[][] entrees= {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
 		// Tableau des sorties de la fonction ET
-		//final float[] resultats = {0, 0, 0, 1};
-		final float[] resultats = {0,1,1,1};
+		final float[] resultats = {0, 0, 0, 1};
+		//final float[] resultats = {0,1,1,1};
 		System.out.println("Initialisation des tableaux");
 		// On crée un neurone taillé pour apprendre la fonction ET
 		//final iNeurone n = new NeuroneHeaviside(entrees[0].length);
@@ -51,9 +52,9 @@ public class testNeurone
 			System.out.println("Entree "+i+" : "+n.sortie());
 		}
 		// Ajouter du bruit aux entrées pour les tests
-        float[][] entreesBruit = ajouterBruitAuxEntrees(entrees, 0.1f); // Ajoute un bruit avec écart-type de 0.1
+        float[][] entreesBruit = ajouterBruitAuxEntrees(entrees, 0.5f); // Ajoute un bruit avec écart-type de 0.1
 		int correct_guess_neurone=0;
-		int repetitions=20;
+		int repetitions=100;
 
 		float sommeProbas = 0;
         int totalCases = 0;
@@ -73,19 +74,19 @@ public class testNeurone
 				correct_guess_neurone++;
 			}
             // On affiche cette sortie
-            //System.out.print("Entree bruitée " + i + " : [");
+            System.out.print("Entree bruitée " + i + " : [");
             for (int j = 0; j < entree.length; j++) {
-                //System.out.print(entree[j]);
-                //if (j < entree.length - 1) System.out.print(" ");
+                System.out.print(entree[j]);
+                if (j < entree.length - 1) System.out.print(" ");
             }
-            //System.out.println("] => Sortie : " + n.sortie());
+            System.out.println("] => Sortie : " + n.sortie());
         }
 		}
 		//float accuracy = (float) correct_guess_neurone / (repetitions * entrees.length);
-        //System.out.println("Précision moyenne après " + repetitions + " répétitions : " + accuracy);
+        //System.out.println("Precision moyenne apres " + repetitions + " repetitions : " + accuracy);
 		// Calculer les statistiques
         float moyenneProbas = sommeProbas / totalCases;
-        System.out.println("Moyenne des probabilités après " + repetitions + " répétitions : " + moyenneProbas);
+        System.out.println("Moyenne des probabilites apres " + repetitions + " repetitions : " + moyenneProbas);
     }
 	
 	 public static float[][] ajouterBruitAuxEntrees(float[][] entrees, float ecartType)
@@ -97,7 +98,7 @@ public class testNeurone
         {
             for (int j = 0; j < entrees[i].length; j++)
             {
-                // Ajouter un bruit gaussien avec moyenne 0 et écart-type donné
+                // Ajouter un bruit avec moyenne 0 et écart-type donné
                 entreesBruit[i][j] = entrees[i][j] + (float)random.nextGaussian() * ecartType;
             }
         }
