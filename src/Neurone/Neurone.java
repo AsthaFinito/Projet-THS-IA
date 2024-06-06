@@ -1,5 +1,6 @@
 package Neurone;
 
+
 public abstract class Neurone implements iNeurone
 {
 	// Coefficient de mise à jour des poids,
@@ -69,7 +70,7 @@ public abstract class Neurone implements iNeurone
 	public int apprentissage(final float[][] entrees, final float[] resultats)
     {
         int compteurEchecs = 0;
-
+		System.out.println("CURRETNLY LEARNING");
         // Un "drapeau" indiquant si toutes les entrées ont permis de trouver
         // les résultats attendus (=> l'apprentissage est alors fini), ou s'il
         // y a au moins un cas qui ne correspond pas (=> apprentissage pas fini)
@@ -84,6 +85,7 @@ public abstract class Neurone implements iNeurone
             // Pour chacune des entrées fournies
             for (int i = 0; i < entrees.length; ++i)
             {
+				System.out.println("IN APPRENTISAGE");
                 final float[] entree = entrees[i];
 
                 // On calcule la sortie du neurone en fonction de ces entrées

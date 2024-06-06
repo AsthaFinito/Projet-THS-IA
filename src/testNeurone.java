@@ -60,34 +60,34 @@ public class testNeurone
 		float sommeProbas = 0;
         int totalCases = 0;
         // On affiche chaque cas appris avec bruit
-		for(int nb_ite_bruit=0;nb_ite_bruit<repetitions;++nb_ite_bruit){
+		//for(int nb_ite_bruit=0;nb_ite_bruit<repetitions;++nb_ite_bruit){
 
 		
-        for (int i = 0; i < entreesBruit.length; ++i)
-        {
-            // Pour une entrée donnée bruitée
-            final float[] entree = entreesBruit[i];
-            // On met à jour la sortie du neurone
-            n.metAJour(entree);
-			sommeProbas += n.sortie();
-			totalCases++;
-			if (Math.round(n.sortie()) == resultats[i]) {
-				correct_guess_neurone++;
-			}
-            // On affiche cette sortie
-            System.out.print("Entree bruitée " + i + " : [");
-            for (int j = 0; j < entree.length; j++) {
-                System.out.print(entree[j]);
-                if (j < entree.length - 1) System.out.print(" ");
-            }
-            System.out.println("] => Sortie : " + n.sortie());
-        }
-		}
-		//float accuracy = (float) correct_guess_neurone / (repetitions * entrees.length);
-        //System.out.println("Precision moyenne apres " + repetitions + " repetitions : " + accuracy);
-		// Calculer les statistiques
-        float moyenneProbas = sommeProbas / totalCases;
-        System.out.println("Moyenne des probabilites apres " + repetitions + " repetitions : " + moyenneProbas);
+        // for (int i = 0; i < entreesBruit.length; ++i)
+        // {
+        //     // Pour une entrée donnée bruitée
+        //     final float[] entree = entreesBruit[i];
+        //     // On met à jour la sortie du neurone
+        //     n.metAJour(entree);
+		// 	sommeProbas += n.sortie();
+		// 	totalCases++;
+		// 	if (Math.round(n.sortie()) == resultats[i]) {
+		// 		correct_guess_neurone++;
+		// 	}
+        //     // On affiche cette sortie
+        //     System.out.print("Entree bruitée " + i + " : [");
+        //     for (int j = 0; j < entree.length; j++) {
+        //         System.out.print(entree[j]);
+        //         if (j < entree.length - 1) System.out.print(" ");
+        //     }
+        //     System.out.println("] => Sortie : " + n.sortie());
+        // }
+		// }
+		// //float accuracy = (float) correct_guess_neurone / (repetitions * entrees.length);
+        // //System.out.println("Precision moyenne apres " + repetitions + " repetitions : " + accuracy);
+		// // Calculer les statistiques
+        // float moyenneProbas = sommeProbas / totalCases;
+        // //System.out.println("Moyenne des probabilites apres " + repetitions + " repetitions : " + moyenneProbas);
     }
 	
 	 public static float[][] ajouterBruitAuxEntrees(float[][] entrees, float ecartType)
