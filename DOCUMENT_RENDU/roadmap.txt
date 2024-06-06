@@ -37,3 +37,20 @@ C'est mieux qu'un pile ou face mais je pense que l'on peut l'améliorer
 Etude du code Son.java :
         commande pour utiliser ->  java .\Son\Son.java '.\Sources sonores\Bruit.wav'  
         java .\Son\DetecteurSon.java  '.\Sources sonores\Bruit.wav'
+
+
+
+
+private static void entrainerNeurones(String[][] fichiers) {
+        for (int i = 0; i < neurones.length; i++) { //Pour chaque neurones
+            float[][] entrees = new float[512][];
+            for(int j=0;j<fichiers.length;j++){//Pour chaque signal
+                Son son = lireFichierWAV(fichiers[j][0]); // On lit le son
+                Complexe[] RecupFFT = appliquerFFT(son); // On récupère les données FFT
+                
+                entrees[j] = extraireCaracteristiques(RecupFFT);
+                System.out.println("Caractéristiques extraites pour le fichier " + fichiers[j][0] + " : " + Arrays.toString(entrees[j]));
+            }
+            
+        }
+    }
