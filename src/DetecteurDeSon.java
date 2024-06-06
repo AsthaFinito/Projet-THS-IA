@@ -28,8 +28,8 @@ public class DetecteurDeSon {
             float[][] resultats = initResultats();
             initialiserNeurones(fichiers.length, 2);
             entrainerNeurones(fichiers);
-            
-            lireSynapseEtBiais();
+            System.out.println("Fin apprentissage");
+            //lireSynapseEtBiais();
             
             //prediction(args[0]);
 
@@ -92,35 +92,39 @@ public class DetecteurDeSon {
     }
     private static void entrainerNeurones(String[][] fichiers) {
         // Pour chaque neurone
-        for (int i = 0; i < fichiers.length; i++) {
+        for (int i = 0; i < neurones.length; i++) {
+            System.out.println("Neurone numéro :"+i);
             float[][] entrees = new float[TailleCalcul/2][];
-            float[] resultats = new float[TailleCalcul];
- //implemetner je fais faire du hardoce pour l'instant
-
-            //  for (int k = 0; k < TailleCalcul; k++) {
-            //     resultats[k] = (k == i) ? genererTableau(TailleCalcul/2, 0) : genererTableau(TailleCalcul/2, -1);
-            // }
-                                //System.out.println("Résultat attendu pour le neurone " + i + " : " + Arrays.toString(resultats));
-            // Pour chaque fichier, calculer les caractéristiques et les stocker
+            float[] resultats = new float[TailleCalcul/2];
+ 
+            // Pour chaque fichier, calculer les caractéristiques et apprendre
             for (int j = 0; j < fichiers.length; j++) {
+                if(j==i){
+                    resultats=genererTableau(TailleCalcul/2, 0);
+                }
+                else{
+                    resultats=genererTableau(TailleCalcul/2, -1);
+                }
                 Son son = lireFichierWAV(fichiers[j][0]); // On lit le son
                 Complexe[] RecupFFT = appliquerFFT(son); // On récupère les données FFT
     
                 
     
                 entrees = extraireCaracteristiques(RecupFFT);
-                 // Afficher les données d'entrée pour le débogage
-                System.out.println("Données d'entrée pour le neurone " + i + " :");
-                for (int x = 0; x < TailleCalcul/2; x++) {
-                    //System.out.println("Entrée " + x + " : " + Arrays.toString(entrees[x]) + ", Résultat attendu : " + resultats[i][x]);
-                }
-                System.out.println("Nombre de tours : "+neurones[i].apprentissage(entrees, resultats));
+                
+                // // //System.out.println("Données d'entrée pour le neurone " + i + " :");
+                // for (int x = 0; x < TailleCalcul/2; x++) {
+                //      //System.out.println("Entrée " + x + " : " + Arrays.toString(entrees[x]) + ", Résultat attendu : " + resultats[x]);
+                //  }
+                
+                System.out.println("Nombre de tours : "+neurones[i].apprentissage(entrees, resultats)+"pour le signal "+j);
+                
             }
            
             
     
-           
-            
+           break;
+           // lireSynapseEtBiais();
         }
     }
     
