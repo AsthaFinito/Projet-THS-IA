@@ -1,3 +1,5 @@
+package Neurone;
+
 public abstract class Neurone implements iNeurone
 {
 	// Coefficient de mise à jour des poids,

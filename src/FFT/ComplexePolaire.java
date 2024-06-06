@@ -1,3 +1,5 @@
+package FFT;
+
 public class ComplexePolaire implements Complexe
 {
 	private double mod;

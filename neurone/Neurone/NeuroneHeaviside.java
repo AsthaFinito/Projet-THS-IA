@@ -1,3 +1,5 @@
+package Neurone;
+
 public class NeuroneHeaviside extends Neurone
 {
 	// Fonction d'activation d'un neurone (peut facilement être modifiée par héritage)

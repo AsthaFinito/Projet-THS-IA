@@ -1,3 +1,7 @@
+package FFT;
+
+
+
 public interface Complexe
 {
 	public double reel();

@@ -1,3 +1,5 @@
+package Neurone;
+
 public class NeuroneSigmoid extends Neurone{
 
     public NeuroneSigmoid(int nbEntrees) {

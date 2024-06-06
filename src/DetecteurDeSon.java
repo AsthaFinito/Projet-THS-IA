@@ -21,7 +21,10 @@ public class DetecteurDeSon {
             System.out.println("Fichier " + args[0] + " : " + son.donnees().length + " échantillons à " + son.frequence() + "Hz");
            
             appliquerFFT(son);
-            final iNeurone n = new NeuroneHeaviside(0);
+            final float[][] entrees = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
+            final float[] resultats = {0, 0, 0, 1};
+            System.out.println("Initialisation des tableaux");
+            final iNeurone n = new NeuroneHeaviside(entrees[0].length);
         } else {
             System.out.println("Veuillez donner le nom d'un fichier WAV en paramètre SVP.");
         }
@@ -33,7 +36,7 @@ public class DetecteurDeSon {
 
     private static void appliquerFFT(Son son) {
         // Lecture d'un bloc de données
-        float[] bloc = son.bloc_deTaille(0, FFTCplx.TailleFFTtest);
+        float[] bloc = son.bloc_deTaille(0, 512);
 
         // Conversion du bloc en nombres complexes
         Complexe[] signalComplexe = new Complexe[bloc.length];
