@@ -43,6 +43,9 @@ public class DetecteurDeSon2 {
         System.out.println(resultat.length);
         System.out.println(entreeNeuroneF.length);
         System.out.println("Nombre de tours : " + neurones[0].apprentissage(entreeNeuroneF, resultat));
+
+        lireSynapseEtBiais();
+        
         prediction(verifNeuroneC, neurones[0], verifNeuroneC.length);
         // Prédiction sur le fichier passé en argument
         System.out.println("Lecture du fichier WAV " + args[0]);
@@ -59,7 +62,19 @@ public class DetecteurDeSon2 {
             neurones[i] = new NeuroneHeaviside(tailleDesEntrees);
         }
     }
-
+    private static void lireSynapseEtBiais() {
+        for (int i = 0; i < neurones.length; i++) {
+            if (neurones[i] instanceof Neurone) {
+                Neurone neurone = (Neurone) neurones[i];
+                float[] synapses = neurone.synapses();
+                System.out.print("Neurone " + i + " - Longueur des synapses : " + synapses.length);
+                // for (float f : neurone.synapses())
+                //     System.out.print(f + " ");
+                System.out.print("\nBiais : ");
+                System.out.println(neurone.biais());
+            }
+        }
+    }
     // Initialisation des sons
     public static Son[] initFichierSon() {
         String[] cheminsFichiers = {

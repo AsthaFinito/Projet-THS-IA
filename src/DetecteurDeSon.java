@@ -123,11 +123,11 @@ public class DetecteurDeSon {
                     //int nombreBlocsAutres = nombreBlocs - nombreBlocsEntrainement; // Nombre de blocs pour les autres signaux
                     
                     float[][] entreesEntrainement = lireTousLesXBlocs(TailleCalcul, son.donnees(), 0.80);// Tableau d'entrées pour l'entraînement
-                    float[] resultatsEntrainement = genererTableau1(entreesEntrainement[0].length/2); // Tableau de résultats pour l'entraînement
+                    // Tableau de résultats pour l'entraînement
                     
 
                     float[][] entreesAutres = lireTousLesXBlocs(TailleCalcul, lireFichierWAV( "./Sources sonores/Bruit.wav").donnees(), 0.80); // Tableau d'entrées pour les autres signaux
-                    float[] resultatsAutres = genererTableau0(entreesAutres[0].length/2); // Tableau de résultats pour les autres signaux
+                    // Tableau de résultats pour les autres signaux
                     
                     // Remplir les tableaux d'entrées et de résultats pour l'entraînement
                     
@@ -135,14 +135,14 @@ public class DetecteurDeSon {
                     // Fusionner les tableaux d'entrées et de résultats
                     float[][] entrees = fusionner2(entreesEntrainement, entreesAutres);
                     entrees=normaliserDonnees(entrees);
-                    float[] resultats = fusionner(resultatsEntrainement, resultatsAutres);
+                    float[] resultatsEntrainement =creerTableau(entrees.length);
                     System.out.println("Taille intermeidaire entree : "+entreesEntrainement[0].length+" "+entreesAutres[0].length);
-                    System.out.println("Taille intermeidaire sortie : "+resultatsEntrainement.length+" "+resultatsAutres.length);
-                    System.out.println("Taille de fin : "+entrees[0].length+" "+resultats.length);
+                   // System.out.println("Taille intermeidaire sortie : "+resultatsEntrainement.length+" "+resultatsAutres.length);
+                   // System.out.println("Taille de fin : "+entrees[0].length+" "+resultats.length);
                     //System.out.println("Tableau de resultats : " + Arrays.toString(resultats));
 
                     // // Entraîner le neurone avec les données
-                    System.out.println("Nombre de tours : " + neurones[i].apprentissage(entrees, resultats));
+                    System.out.println("Nombre de tours : " + neurones[i].apprentissage(entrees, resultatsEntrainement));
                     // break;
                 
             }
@@ -155,14 +155,56 @@ public class DetecteurDeSon {
         System.arraycopy(tableau2, 0, fusion, tableau1.length, tableau2.length);
         return fusion;
     }
+    public static float[] creerTableau(int taille) {
+        float[] tableau = new float[taille];
+        int moitie = taille / 2;
 
+        // Remplir la première moitié de 1.0f
+        for (int i = 0; i < moitie; i++) {
+            tableau[i] = 1.0f;
+        }
+
+        // Remplir la deuxième moitié de 0.0f
+        for (int i = moitie; i < taille; i++) {
+            tableau[i] = 0.0f;
+        }
+
+        return tableau;
+    }
     // Fonction pour fusionner deux tableaux de float[] en un tableau 2D
-    private static float[][] fusionner2(float[][] tableau1, float[][] tableau2) {
-        float[][] fusion = new float[tableau1.length + tableau2.length][tableau1[0].length];
-        System.arraycopy(tableau1, 0, fusion, 0, tableau1.length);
-        System.arraycopy(tableau2, 0, fusion, tableau1.length, tableau2.length);
+    public static Complexe[][] fusionner2(Complexe[][] matrice1, Complexe[][] matrice2) {
+        int totalRows = matrice1.length + matrice2.length;
+        int cols = matrice1[0].length;
+        Complexe[][] fusion = new Complexe[totalRows][cols];
+
+        for (int i = 0; i < matrice1.length; i++) {
+            fusion[i] = matrice1[i];
+        }
+
+        for (int i = 0; i < matrice2.length; i++) {
+            fusion[matrice1.length + i] = matrice2[i];
+        }
+
         return fusion;
     }
+    public static float[][] fusionner2(float[][] matrice1, float[][] matrice2) {
+        int totalRows = matrice1.length + matrice2.length;
+        int cols = Math.max(matrice1[0].length, matrice2[0].length);
+        float[][] fusion = new float[totalRows][cols];
+    
+        for (int i = 0; i < matrice1.length; i++) {
+            fusion[i] = new float[cols];
+            System.arraycopy(matrice1[i], 0, fusion[i], 0, matrice1[i].length);
+        }
+    
+        for (int i = 0; i < matrice2.length; i++) {
+            fusion[matrice1.length + i] = new float[cols];
+            System.arraycopy(matrice2[i], 0, fusion[matrice1.length + i], 0, matrice2[i].length);
+        }
+    
+        return fusion;
+    }
+    
     //Retourne une classe son pour lire wav
     private static Son lireFichierWAV(String fichier) {
         return new Son(fichier);
