@@ -29,7 +29,7 @@ public class DetecteurDeSon {
             System.out.println("Fin apprentissage");
             lireSynapseEtBiais(); //Voir l'état des poids et du biais
             
-            //prediction(args[0]);
+            prediction(args[0]);
 
             // final float[][] entrees = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
             // final float[] resultats = {0, 0, 0, 1};
@@ -127,7 +127,7 @@ public class DetecteurDeSon {
                 entrees = normaliserDonnees(entrees); // Normaliser les données
                 // //System.out.println("Données d'entrée pour le neurone " + i + " :");
                 for (int x = 0; x < TailleCalcul/2; x++) {
-                      System.out.println("Entrée " + x + " : " + Arrays.toString(entrees[x]) + ", Résultat attendu : " + resultats[x]);
+                      //System.out.println("Entrée " + x + " : " + Arrays.toString(entrees[x]) + ", Résultat attendu : " + resultats[x]);
                       
                  }
                  
