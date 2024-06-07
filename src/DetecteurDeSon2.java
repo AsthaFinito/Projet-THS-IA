@@ -20,7 +20,7 @@ public class DetecteurDeSon2 {
 
     public static void main(String[] args) {
         Son[] allSons = initFichierSon();
-        initialiserNeurones(allSons.length, TAILLE_FFT);
+        initialiserNeurones(allSons.length-1, TAILLE_FFT);
         final int[] nbBloc = new int[allSons.length];
         listeFFTGuess = new Complexe[allSons.length][][];
         fftForAllSons(allSons, nbBloc);
@@ -34,8 +34,8 @@ public class DetecteurDeSon2 {
             listeTest[i] = Arrays.copyOfRange(listeFFTGuess[i], nbBlocsTrain, nbBlocsTrain + nbBlocsTest);
         }
 
-        Complexe[][] entreeNeuroneC = fusion(listeTrain[0], listeTrain[2]);
-        Complexe[][] verifNeuroneC = fusion(listeTest[0], listeTest[2]);
+        Complexe[][] entreeNeuroneC = fusion(listeTrain[0], listeTrain[5]);
+        Complexe[][] verifNeuroneC = fusion(listeTest[0], listeTest[5]);
 
         float[][] entreeNeuroneF = convFFTtoEntree(entreeNeuroneC, entreeNeuroneC.length, TAILLE_FFT);
         entreeNeuroneF = normaliserDonnees(entreeNeuroneF);
@@ -80,9 +80,10 @@ public class DetecteurDeSon2 {
         String[] cheminsFichiers = {
             "./Sources sonores/Carre.wav",
             "./Sources sonores/Sinusoide.wav",
-            "./Sources sonores/Bruit.wav",
+            "./Sources sonores/Sinusoide2.wav",
             "./Sources sonores/Sinusoide3Harmoniques.wav",
-            "./Sources sonores/Sinusoide2.wav"
+            "./Sources sonores/Combinaison.wav",
+            "./Sources sonores/Bruit.wav"
         };
 
         Son[] sons = new Son[cheminsFichiers.length];
