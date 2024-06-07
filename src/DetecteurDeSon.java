@@ -62,7 +62,7 @@ public class DetecteurDeSon {
     private static void initialiserNeurones(int nombreDeNeurones, int tailleDesEntrees) {
         neurones = new iNeurone[nombreDeNeurones];
         for (int i = 0; i < nombreDeNeurones; i++) {
-            neurones[i] = new NeuroneHeaviside(tailleDesEntrees);
+            neurones[i] = new NeuroneSigmoid(tailleDesEntrees);
         }
     }
     //Genere un tableau de 1
@@ -133,24 +133,30 @@ public class DetecteurDeSon {
                 Complexe[] fftResult = appliquerFFT2(bloc);
                 fftResults[fichierIndex][blocIndex] = fftResult; // Stocker les résultats de la FFT dans le tableau
                 blocIndex++;
-                
             }
-              // Extraire les caractéristiques des résultats FFT pour l'entraînement
-              float[][] entrees = new float[tousLesBlocs.length][TailleCalcul];
-              for (int j = 0; j < tousLesBlocs.length; j++) {
-                  entrees[j] = extraireCaracteristiques(fftResults[fichierIndex][j]);
-              }
-              if (fichiers[fichierIndex][0].contains("Carre")) {
+    
+            // Extraire les caractéristiques des résultats FFT pour l'entraînement
+            float[][] entrees = new float[tousLesBlocs.length][TailleCalcul];
+            for (int j = 0; j < tousLesBlocs.length; j++) {
+                entrees[j] = extraireCaracteristiques(fftResults[fichierIndex][j]);
+            }
+    
+            // Si le fichier correspond à un signal carré, les résultats attendus sont 1, sinon 0
+            if (fichiers[fichierIndex][0].contains("Carre")) {
                 resultats = genererTableau1(tousLesBlocs.length);
             } else {
                 resultats = genererTableau0(tousLesBlocs.length);
             }
-              //resultats = genererTableau1(tousLesBlocs.length); // Résultats attendus pour le neurone en cours d'entraînement
-              entrees = normaliserDonnees(entrees); // Normaliser les données
-              System.out.println("Nombre de tours : " + neurones[i].apprentissage(entrees, resultats) + " pour le signal " + fichierIndex);
-             blocIndex = 0; // Réinitialiser l'index de bloc pour le prochain fichier
+    
+            // Normaliser les données et effectuer l'apprentissage
+            entrees = normaliserDonnees(entrees);
+            System.out.println("Nombre de tours : " + neurones[i].apprentissage(entrees, resultats) + " pour le signal " + fichierIndex);
+    
+            // Réinitialiser l'index de bloc pour le prochain fichier
+            blocIndex = 0;
         }
     }
+    
 
     //Retourne une classe son pour lire wav
     private static Son lireFichierWAV(String fichier) {
