@@ -115,7 +115,7 @@ public class DetecteurDeSon {
     
         private static void entrainerNeurones(String[][] fichiers) {
             for(int i = 0; i < neurones.length; i++) { // Pour chaque neurone
-                    System.out.println("Entrainement pour le neurone "+i+" avec comme signal "+fichiers[i][0]);
+                    //System.out.println("Entrainement pour le neurone "+i+" avec comme signal "+fichiers[i][0]);
                     Son son = lireFichierWAV(fichiers[i][0]); // Lire le signal
                     
                     int nombreBlocs = son.donnees().length / TailleCalcul; // Calculer le nombre total de blocs
@@ -123,27 +123,27 @@ public class DetecteurDeSon {
                     //int nombreBlocsAutres = nombreBlocs - nombreBlocsEntrainement; // Nombre de blocs pour les autres signaux
                     
                     float[][] entreesEntrainement = lireTousLesXBlocs(TailleCalcul, son.donnees(), 0.80);// Tableau d'entrées pour l'entraînement
-                    float[] resultatsEntrainement = genererTableau1(entreesEntrainement[0].length); // Tableau de résultats pour l'entraînement
+                    float[] resultatsEntrainement = genererTableau1(entreesEntrainement[0].length/2); // Tableau de résultats pour l'entraînement
                     
 
                     float[][] entreesAutres = lireTousLesXBlocs(TailleCalcul, lireFichierWAV( "./Sources sonores/Bruit.wav").donnees(), 0.80); // Tableau d'entrées pour les autres signaux
-                    float[] resultatsAutres = genererTableau0(entreesAutres[0].length); // Tableau de résultats pour les autres signaux
+                    float[] resultatsAutres = genererTableau0(entreesAutres[0].length/2); // Tableau de résultats pour les autres signaux
                     
                     // Remplir les tableaux d'entrées et de résultats pour l'entraînement
                     
                     
                     // Fusionner les tableaux d'entrées et de résultats
-                    //float[][] entrees = fusionner2(entreesEntrainement, entreesAutres);
+                    float[][] entrees = fusionner2(entreesEntrainement, entreesAutres);
                     entrees=normaliserDonnees(entrees);
                     float[] resultats = fusionner(resultatsEntrainement, resultatsAutres);
                     System.out.println("Taille intermeidaire entree : "+entreesEntrainement[0].length+" "+entreesAutres[0].length);
                     System.out.println("Taille intermeidaire sortie : "+resultatsEntrainement.length+" "+resultatsAutres.length);
                     System.out.println("Taille de fin : "+entrees[0].length+" "+resultats.length);
-                    System.out.println("Tableau de resultats : " + Arrays.toString(resultats));
+                    //System.out.println("Tableau de resultats : " + Arrays.toString(resultats));
 
-                    // Entraîner le neurone avec les données
+                    // // Entraîner le neurone avec les données
                     System.out.println("Nombre de tours : " + neurones[i].apprentissage(entrees, resultats));
-                    break;
+                    // break;
                 
             }
         }
