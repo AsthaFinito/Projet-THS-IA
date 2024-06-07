@@ -18,6 +18,7 @@ import javax.sound.sampled.AudioFormat;
 public class DetecteurDeSon {
     private static iNeurone[] neurones;
     private static int TailleCalcul=512; //Taille de la FFT
+    private static Complexe[][][] fftResults;
     public static void main(String[] args) {
 
         if (args.length == 1) {
@@ -29,6 +30,7 @@ public class DetecteurDeSon {
           
             entrainerNeurones(fichiers);
             System.out.println("Fin apprentissage");
+            float[] donnees=new float[1];
             
             //lireSynapseEtBiais(); //Voir l'état des poids et du biais
             
@@ -41,13 +43,14 @@ public class DetecteurDeSon {
         }
     }
 
-    public float[][] lireTousLesBlocs(final int tailleBloc,float[] donnees) {
+    public static float[][] lireTousLesBlocs( int tailleBloc,float[] donnees) {
         int nombreTotalBlocs = donnees.length / tailleBloc; // Calculer le nombre total de blocs
         float[][] tousLesBlocs = new float[nombreTotalBlocs][tailleBloc]; // Initialiser un tableau pour stocker tous les blocs
     
         // Parcourir tous les blocs
         for (int i = 0; i < nombreTotalBlocs; i++) {
             tousLesBlocs[i] = bloc_deTaille(i, tailleBloc,donnees); // Lire chaque bloc et l'ajouter au tableau
+            //System.out.println("Lecture d'un bloc");
         }
     
         return tousLesBlocs; // Retourner tous les blocs
@@ -59,7 +62,7 @@ public class DetecteurDeSon {
     private static void initialiserNeurones(int nombreDeNeurones, int tailleDesEntrees) {
         neurones = new iNeurone[nombreDeNeurones];
         for (int i = 0; i < nombreDeNeurones; i++) {
-            neurones[i] = new NeuroneSigmoid(tailleDesEntrees);
+            neurones[i] = new NeuroneHeaviside(tailleDesEntrees);
         }
     }
     //Genere un tableau de 1
@@ -108,38 +111,47 @@ public class DetecteurDeSon {
     }
 
     private static void entrainerNeurones(String[][] fichiers) {
+        // Déterminer le nombre total de blocs pour initialiser le tableau FFT
+        int nombreTotalBlocs = 0;
+        for (String[] fichier : fichiers) {
+            Son son = lireFichierWAV(fichier[0]);
+            nombreTotalBlocs += son.donnees().length / TailleCalcul;
+        }
         
-        // Pour chaque neurone
+        fftResults = new Complexe[fichiers.length][nombreTotalBlocs][TailleCalcul]; // Initialiser le tableau FFT
+    
+        int blocIndex = 0;
         for (int i = 0; i < neurones.length; i++) {
             System.out.println("Entraînement du neurone numéro : " + i);
-            float[][] entrees;
             float[] resultats;
     
-            // On sélectionne le fichier correspondant à l'indice du neurone pour l'entraînement
-            int fichierIndex = i % fichiers.length; // Utilisation du modulo pour répéter les fichiers si nécessaire
-            resultats = genererTableau1(TailleCalcul); // Résultats attendus pour le neurone en cours d'entraînement
-            Son son = lireFichierWAV(fichiers[fichierIndex][0]); // On lit le son du fichier correspondant
-            Complexe[] RecupFFT = appliquerFFT(son); // On récupère les données FFT
-
-            // System.out.println("Sortie de la FFT pour le neurone " + i + " :");
-            // for (int x = 0; x < RecupFFT.length; x++) {
-            //     System.out.println("Amplitude " + x + " : " + (float) RecupFFT[x].mod());
-            // }
-            entrees = extraireCaracteristiques(RecupFFT); // On récupère les caractéristiques
-            
-            // Normaliser les données
-            entrees = normaliserDonnees(entrees);
-            //System.out.println("Taille entree : "+entrees[0].length+" Taille resultat : "+resultats.length);
-            // // Afficher les données d'entrée pour vérification
-            // System.out.println("Données d'entrée pour le neurone " + i + " :");
-        
-            //System.out.println("Entrée "  + " : " + Arrays.toString(entrees[0]) + ", Résultat attendu : " + resultats[0]);
-            
+            int fichierIndex = i % fichiers.length;
+            Son son = lireFichierWAV(fichiers[fichierIndex][0]);
     
-            // // Entraîner le neurone avec les données
-            System.out.println("Nombre de tours : " + neurones[i].apprentissage(entrees, resultats) + " pour le signal " + fichierIndex);
+            float[][] tousLesBlocs = lireTousLesBlocs(TailleCalcul, son.donnees());
+            for (float[] bloc : tousLesBlocs) {
+                Complexe[] fftResult = appliquerFFT2(bloc);
+                fftResults[fichierIndex][blocIndex] = fftResult; // Stocker les résultats de la FFT dans le tableau
+                blocIndex++;
+                
+            }
+              // Extraire les caractéristiques des résultats FFT pour l'entraînement
+              float[][] entrees = new float[tousLesBlocs.length][TailleCalcul];
+              for (int j = 0; j < tousLesBlocs.length; j++) {
+                  entrees[j] = extraireCaracteristiques(fftResults[fichierIndex][j]);
+              }
+              if (fichiers[fichierIndex][0].contains("Carre")) {
+                resultats = genererTableau1(tousLesBlocs.length);
+            } else {
+                resultats = genererTableau0(tousLesBlocs.length);
+            }
+              //resultats = genererTableau1(tousLesBlocs.length); // Résultats attendus pour le neurone en cours d'entraînement
+              entrees = normaliserDonnees(entrees); // Normaliser les données
+              System.out.println("Nombre de tours : " + neurones[i].apprentissage(entrees, resultats) + " pour le signal " + fichierIndex);
+             blocIndex = 0; // Réinitialiser l'index de bloc pour le prochain fichier
         }
     }
+
     //Retourne une classe son pour lire wav
     private static Son lireFichierWAV(String fichier) {
         return new Son(fichier);
@@ -167,18 +179,34 @@ public class DetecteurDeSon {
        // System.out.println("FFT FINI");
         return resultat;
     }
-    //Extrait seulement le module et la phase de nos données pour anaylse neurone
-    public static float[][] extraireCaracteristiques(Complexe[] fftResult) {
-        int n = fftResult.length ; // On prend seulement la moitié du spectre FFT, car l'autre moitié est symétrique
-        float[][] features = new float[1][n]; // Initialisation du tableau de tableaux
-    
-        // Extraction des amplitudes de la FFT
-        for (int i = 0; i < n; i++) {
-            features[0][i] = (float) fftResult[i].mod(); // Amplitude
+    private static Complexe[] appliquerFFT2(float[] bloc) {
+        // Conversion du bloc en nombres complexes
+        Complexe[] signalComplexe = new Complexe[bloc.length];
+        for (int i = 0; i < bloc.length; i++) {
+            signalComplexe[i] = new ComplexeCartesien(bloc[i], 0);
         }
     
+        // Application de la FFT sur le bloc de données
+        Complexe[] resultat = FFTCplx.appliqueSur(signalComplexe);
+    
+        // Analyse des résultats de la FFT
+        //System.out.println("Résultats de la FFT :");
+        for (int i = 0; i < resultat.length; i++) {
+            //System.out.print(i + " : (" + (float) resultat[i].reel() + " ; " + (float) resultat[i].imag() + "i)");
+            //System.out.println(", (" + (float) resultat[i].mod() + " ; " + (float) resultat[i].arg() + " rad)");
+        }
+        // System.out.println("FFT FINI");
+        return resultat;
+    }
+    //Extrait seulement le module et la phase de nos données pour anaylse neurone
+    private static float[] extraireCaracteristiques(Complexe[] fftResult) {
+        float[] features = new float[fftResult.length];
+        for (int i = 0; i < fftResult.length; i++) {
+            features[i] = (float) fftResult[i].mod();
+        }
         return features;
     }
+    
     //Duplicate fonction pour la prédiction (pour l'instant useless)
     public static float[] extraireCaracteristiquesPrediction(Complexe[] fftResult) {
         int n = fftResult.length; // Nombre de valeurs dans le résultat de la FFT
@@ -207,28 +235,41 @@ public class DetecteurDeSon {
     
     //Fonction useless pour l'instant 
     private static void prediction(String fichier) {
+        // Lire le fichier WAV
         Son son = lireFichierWAV(fichier);
-        Complexe[] RecupFFT = appliquerFFT(son);
-        float[] features = extraireCaracteristiquesPrediction(RecupFFT);
-
-        float maxPrediction = -Float.MAX_VALUE;
-        int bestNeuroneIndex = -1;
-        for (int i = 0; i < neurones.length; i++) {
-            neurones[i].metAJour(features);
-            float prediction = neurones[i].sortie();
-            System.out.println("Prédiction du neurone " + i + " : " + prediction);
-            if (prediction > maxPrediction) {
-                maxPrediction = prediction;
-                bestNeuroneIndex = i;
+        
+        // Lire tous les blocs du signal
+        float[][] tousLesBlocs = lireTousLesBlocs(TailleCalcul, son.donnees());
+        
+        // Initialiser un tableau pour accumuler les sorties de chaque neurone
+        float[] sommeSorties = new float[neurones.length];
+        int nombreBlocs = tousLesBlocs.length;
+    
+        for (float[] bloc : tousLesBlocs) {
+            // Appliquer la FFT sur chaque bloc
+            Complexe[] fftResult = appliquerFFT2(bloc);
+            
+            // Extraire les caractéristiques des résultats FFT pour la prédiction
+            float[] features = extraireCaracteristiquesPrediction(fftResult);
+            
+            // Normaliser les caractéristiques pour la prédiction
+            float[] normalizedFeatures = normaliserDonnees(new float[][] {features})[0];
+            
+            // Mettre à jour chaque neurone avec les caractéristiques normalisées et accumuler les sorties
+            for (int i = 0; i < neurones.length; i++) {
+                neurones[i].metAJour(normalizedFeatures);
+                float prediction = neurones[i].sortie();
+                sommeSorties[i] += prediction;
             }
         }
-
-        // Afficher la prédiction finale
-        String[] typesDeSignal = {"Carré", "Sinusoïde", "Bruit", "Sinusoïde 3 Harmoniques", "Sinusoïde 2", "Combinaison"};
-        System.out.println("Le fichier " + fichier + " est prédit comme étant de type : " + typesDeSignal[bestNeuroneIndex]);
-
-// }
+    
+        // Calculer et afficher la moyenne des sorties pour chaque neurone
+        for (int i = 0; i < neurones.length; i++) {
+            float moyenneSortie = sommeSorties[i] / nombreBlocs;
+            System.out.println("Moyenne de la sortie du neurone " + i + " : " + moyenneSortie);
+        }
     }
+    
     
     
     //On normalise les données pour facilier l'entrainement
@@ -265,7 +306,7 @@ private static float[][] normaliserDonnees(float[][] donnees) {
     }
     return normalisees;
 }
-public float[] bloc_deTaille(final int numeroBloc, final int tailleBloc,float[] donnees) {
+public static float[] bloc_deTaille(final int numeroBloc, final int tailleBloc,float[] donnees) {
     final int from = numeroBloc * tailleBloc;
     final int to = from + tailleBloc;
     return Arrays.copyOfRange(donnees, from, to);
