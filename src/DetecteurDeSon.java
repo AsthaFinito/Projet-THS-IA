@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Random;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
@@ -29,7 +30,7 @@ public class DetecteurDeSon {
             System.out.println("Fin apprentissage");
             lireSynapseEtBiais(); //Voir l'état des poids et du biais
             
-            prediction(args[0]);
+            //prediction(fichiers);
 
             // final float[][] entrees = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
             // final float[] resultats = {0, 0, 0, 1};
@@ -44,7 +45,7 @@ public class DetecteurDeSon {
     private static void initialiserNeurones(int nombreDeNeurones, int tailleDesEntrees) {
         neurones = new iNeurone[nombreDeNeurones];
         for (int i = 0; i < nombreDeNeurones; i++) {
-            neurones[i] = new NeuroneHeaviside(tailleDesEntrees);
+            neurones[i] = new NeuroneSigmoid(tailleDesEntrees);
         }
     }
     //Genere un tableau de 1
@@ -123,7 +124,7 @@ public class DetecteurDeSon {
     
                 
     
-                entrees = extraireCaracteristiques(RecupFFT);
+                entrees = extraireCaracteristiques(RecupFFT); //On recup module et phase
                 entrees = normaliserDonnees(entrees); // Normaliser les données
                 // //System.out.println("Données d'entrée pour le neurone " + i + " :");
                 for (int x = 0; x < TailleCalcul/2; x++) {
@@ -188,33 +189,42 @@ public class DetecteurDeSon {
         }
         return features;
     }
-    //Fonction useless pour l'instant
-    private static void prediction(String fichier) {
-        Son son = lireFichierWAV(fichier);
-        Complexe[] RecupFFT = appliquerFFT(son);
-        float[] features = extraireCaracteristiquesPrediction(RecupFFT);
 
-        // Afficher les valeurs des caractéristiques extraites pour le fichier de test
-        System.out.println("Caractéristiques extraites pour le fichier de test : ");
-        
-
-        // Utiliser chaque neurone pour faire une prédiction
-        float maxPrediction = -Float.MAX_VALUE;
-        int bestNeuroneIndex = -1;
-        for (int i = 0; i < neurones.length; i++) {
-            neurones[i].metAJour(features);
-            float prediction = neurones[i].sortie();
-            System.out.println("Prédiction du neurone " + i + " : " + prediction);
-            if (prediction > maxPrediction) {
-                maxPrediction = prediction;
-                bestNeuroneIndex = i;
-            }
-        }
-
-        // Afficher la prédiction finale
-        String[] typesDeSignal = {"Carré", "Sinusoïde", "Bruit", "Sinusoïde 3 Harmoniques", "Sinusoïde 2", "Combinaison"};
-        System.out.println("Le fichier " + fichier + " est prédit comme étant de type : " + typesDeSignal[bestNeuroneIndex]);
+    //Fonction useless pour l'instant 
+    private static void prediction(String[][] fichiers) {
+        // Utilisation du même objet Random pour la cohérence
+        Random rand = new Random();
     
+        // Utiliser chaque neurone pour faire une prédiction
+        int numPredictions = 25; // Nombre de prédictions aléatoires à faire
+        for (int j = 0; j < numPredictions; j++) {
+            // Sélection aléatoire d'un fichier de test depuis la liste de fichiers à chaque itération
+            int fichierIndex = rand.nextInt(fichiers.length);
+            String[] fichier = fichiers[fichierIndex];
+    
+            Son son = lireFichierWAV(fichier[0]); // Le nom du fichier est à l'indice 0 dans le sous-tableau
+            Complexe[] RecupFFT = appliquerFFT(son);
+            float[] features = extraireCaracteristiquesPrediction(RecupFFT);
+    
+            // Afficher les valeurs des caractéristiques extraites pour le fichier de test
+            //System.out.println("Caractéristiques extraites pour le fichier de test " + fichier[0] + " : ");
+    
+            float maxPrediction = -Float.MAX_VALUE;
+            int bestNeuroneIndex = -1;
+            for (int i = 0; i < neurones.length; i++) {
+                neurones[i].metAJour(features);
+                float prediction = neurones[i].sortie(); // Utilisez une fonction de sigmoïde pour obtenir une sortie entre 0 et 1
+                System.out.println("Prédiction " + (j + 1) + " du neurone " + i + " pour le fichier " + fichier[0] + " : " + prediction);
+                if (prediction > maxPrediction) {
+                    maxPrediction = prediction;
+                    bestNeuroneIndex = i;
+                }
+            }
+            // Afficher la prédiction finale pour chaque itération
+            String[] typesDeSignal = {"Carré", "Sinusoïde", "Bruit", "Sinusoïde 3 Harmoniques", "Sinusoïde 2", "Combinaison"};
+            //System.out.println("Prédiction " + (j + 1) + " pour le fichier " + fichier[0] + " : " + typesDeSignal[bestNeuroneIndex]);
+            //System.out.println(); // Saut de ligne pour séparer les prédictions
+        }
     }
     //On normalise les données pour facilier l'entrainement
     private static float[][] normaliserDonnees(float[][] donnees) {
