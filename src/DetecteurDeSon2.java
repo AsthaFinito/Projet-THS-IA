@@ -34,25 +34,15 @@ public class DetecteurDeSon2 {
             listeTest[i] = Arrays.copyOfRange(listeFFTGuess[i], nbBlocsTrain, nbBlocsTrain + nbBlocsTest);
         }
 
-        Complexe[][] entreeNeuroneC = fusion(listeTrain[0], listeTrain[5]);
-        Complexe[][] verifNeuroneC = fusion(listeTest[0], listeTest[5]);
-
-        float[][] entreeNeuroneF = convFFTtoEntree(entreeNeuroneC, entreeNeuroneC.length, TAILLE_FFT);
-        entreeNeuroneF = normaliserDonnees(entreeNeuroneF);
-        float[] resultat = creerTableau(entreeNeuroneF.length);
-        System.out.println(resultat.length);
-        System.out.println(entreeNeuroneF.length);
-        System.out.println("Nombre de tours : " + neurones[0].apprentissage(entreeNeuroneF, resultat));
-
-        lireSynapseEtBiais();
+        //Complexe[][] verifNeuroneC=entrainerEtPredirePour1Neurone(0,5,0);
+        entrainerTousLesNeurones();
         
-        prediction(verifNeuroneC, neurones[0], verifNeuroneC.length);
-        // Prédiction sur le fichier passé en argument
-        System.out.println("Lecture du fichier WAV " + args[0]);
-        Son sonToPredict = new Son(args[0]);
-        int nbBlocPredict = sonToPredict.donnees().length / TAILLE_FFT;
-        Complexe[][] signalToPredict = fftSur1Son(sonToPredict, nbBlocPredict);
-        prediction(signalToPredict, neurones[0], nbBlocPredict);
+        if (args.length > 0) {
+            predireSurFichier(args[0]);
+        }
+
+
+        //testerNeuroneSurTousLesSons(neurones[0],allSons);
     }
 
     // InitNeurone
@@ -62,6 +52,34 @@ public class DetecteurDeSon2 {
             neurones[i] = new NeuroneHeaviside(tailleDesEntrees);
         }
     }
+
+    private static Complexe[][] entrainerEtPredirePour1Neurone(int indexTrain1, int indexTrain2,int indexNeurone) {
+        Complexe[][] entreeNeuroneC = fusion(listeTrain[indexTrain1], listeTrain[indexTrain2]);
+        Complexe[][] verifNeuroneC = fusion(listeTest[indexTrain1], listeTest[indexTrain2]);
+
+        float[][] entreeNeuroneF = convFFTtoEntree(entreeNeuroneC, entreeNeuroneC.length, TAILLE_FFT);
+        entreeNeuroneF = normaliserDonnees(entreeNeuroneF);
+        float[] resultat = creerTableau(entreeNeuroneF.length);
+
+        System.out.println(resultat.length);
+        System.out.println(entreeNeuroneF.length);
+        System.out.println("Nombre de tours : " + neurones[0].apprentissage(entreeNeuroneF, resultat));
+
+        lireSynapseEtBiais();
+
+        prediction(verifNeuroneC, neurones[indexNeurone], verifNeuroneC.length);
+        return verifNeuroneC;
+    }
+
+    private static void entrainerTousLesNeurones() {
+        for (int i = 0; i < neurones.length; i++) {
+            int indexTrain1 = i; 
+            int indexTrain2 = 5; // harcode
+            System.out.println("Entraînement du neurone " + i + " avec les indices " + indexTrain1 + " et " + indexTrain2);
+            entrainerEtPredirePour1Neurone(indexTrain1, indexTrain2, i);
+        }
+    }
+
     private static void lireSynapseEtBiais() {
         for (int i = 0; i < neurones.length; i++) {
             if (neurones[i] instanceof Neurone) {
@@ -92,6 +110,15 @@ public class DetecteurDeSon2 {
         }
 
         return sons;
+    }
+
+
+    private static void predireSurFichier(String nomFichier) {
+        System.out.println("Lecture du fichier WAV " + nomFichier);
+        Son sonToPredict = new Son(nomFichier);
+        int nbBlocPredict = sonToPredict.donnees().length / TAILLE_FFT;
+        Complexe[][] signalToPredict = fftSur1Son(sonToPredict, nbBlocPredict);
+        prediction(signalToPredict, neurones[0], nbBlocPredict);
     }
 
     private static Complexe[][] fftSur1Son(Son son, int nbBloc) {
