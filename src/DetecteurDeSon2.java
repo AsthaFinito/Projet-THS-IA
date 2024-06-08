@@ -34,8 +34,18 @@ public class DetecteurDeSon2 {
             listeTest[i] = Arrays.copyOfRange(listeFFTGuess[i], nbBlocsTrain, nbBlocsTrain + nbBlocsTest);
         }
 
-        //Complexe[][] verifNeuroneC=entrainerEtPredirePour1Neurone(0,5,0);
-        entrainerTousLesNeurones();
+        float moyenne = 0;
+        for (int tour = 0; tour < 50; tour++) {
+            Complexe[][] verifNeuroneC = entrainerEtPredirePour1Neurone(0, 1, 0);
+
+            System.out.println("Lecture du fichier WAV " + args[0]);
+            Son sonToPredict = new Son(args[0]);
+            int nbBlocPredict = sonToPredict.donnees().length / TAILLE_FFT;
+            Complexe[][] signalToPredict = fftSur1Son(sonToPredict, nbBlocPredict);
+            moyenne += prediction(signalToPredict, neurones[0], nbBlocPredict);
+        }
+        System.out.println("Fin de statistique sur " + 50 + " tours avec " + moyenne / 50 + " de précision pour " + args[0]);
+        //entrainerTousLesNeurones();
         
         if (args.length > 0) {
             predireSurFichier(args[0]);
@@ -65,7 +75,7 @@ public class DetecteurDeSon2 {
         System.out.println(entreeNeuroneF.length);
         System.out.println("Nombre de tours : " + neurones[0].apprentissage(entreeNeuroneF, resultat));
 
-        lireSynapseEtBiais();
+        //lireSynapseEtBiais();
 
         prediction(verifNeuroneC, neurones[indexNeurone], verifNeuroneC.length);
         return verifNeuroneC;
@@ -253,7 +263,7 @@ public class DetecteurDeSon2 {
         return tableau;
     }
 
-    public static void prediction(Complexe[][] signalTrain, iNeurone nCarre, int nbBloc) {
+    public static float prediction(Complexe[][] signalTrain, iNeurone nCarre, int nbBloc) {
         // Conversion de notre signal à notre entrée de neurone
         final int taille = signalTrain[0].length;
         float[][] entrees = convFFTtoEntree(signalTrain, nbBloc, taille);
@@ -281,6 +291,7 @@ public class DetecteurDeSon2 {
         float moyenneSorties = sommeSorties / nbBloc;
         // Affichage de la moyenne
         System.out.println("Moyenne des sorties : " + moyenneSorties);
+        return moyenneSorties;
     }
 }
 
