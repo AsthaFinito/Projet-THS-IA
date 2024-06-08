@@ -19,15 +19,16 @@ public class DetecteurDeSon2 {
     private static iNeurone[] neurones;
 
     public static void main(String[] args) {
-        Son[] allSons = initFichierSon();
-        initialiserNeurones(allSons.length-1, TAILLE_FFT);
+        Son[] allSons = initFichierSon();// Initialiser les fichiers son
+        initialiserNeurones(allSons.length-1, TAILLE_FFT); // Initialiser les neurones
         final int[] nbBloc = new int[allSons.length];
         listeFFTGuess = new Complexe[allSons.length][][];
-        fftForAllSons(allSons, nbBloc);
+        fftForAllSons(allSons, nbBloc); // Effectuer la FFT pour tous les sons
         listeTrain = new Complexe[allSons.length][][];
         listeTest = new Complexe[allSons.length][][];
 
-        for (int i = 0; i < allSons.length; i++) {
+         // Séparer les données en ensembles d'entraînement et de test
+        for (int i = 0; i < allSons.length; i++) { 
             int nbBlocsTrain = (int) (nbBloc[i] * 0.8);
             int nbBlocsTest = nbBloc[i] - nbBlocsTrain;
             listeTrain[i] = Arrays.copyOfRange(listeFFTGuess[i], 0, nbBlocsTrain);
@@ -46,6 +47,8 @@ public class DetecteurDeSon2 {
         // }
         //System.out.println("Fin de statistique sur " + 50 + " tours avec " + moyenne / 50 + " de précision pour " + args[0]);
         //entrainerTousLesNeurones();
+
+        // opérations d'entraînement et de prédiction
         Complexe[][] verifNeuroneC = entrainerEtPredirePour1Neurone(0, 1, 0);
         hardcodeEntrainementSinus();
         hardcodeEntrainementSinus2();
@@ -58,7 +61,7 @@ public class DetecteurDeSon2 {
         //testerNeuroneSurTousLesSons(neurones[0],allSons);
     }
 
-    // InitNeurone
+    // Initialise les neurones avec le nombre et la taille des entrées spécifiées
     private static void initialiserNeurones(int nombreDeNeurones, int tailleDesEntrees) {
         neurones = new iNeurone[nombreDeNeurones];
         for (int i = 0; i < nombreDeNeurones; i++) {
@@ -66,6 +69,7 @@ public class DetecteurDeSon2 {
         }
     }
 
+    // Entraîner et prédire pour un neurone donné
     private static Complexe[][] entrainerEtPredirePour1Neurone(int indexTrain1, int indexTrain2,int indexNeurone) {
         // Fusionner les signaux d'entraînement (hardcode pour l'instant)
         Complexe[][] entreeNeuroneC = listeTrain[indexTrain1];
@@ -102,6 +106,7 @@ public class DetecteurDeSon2 {
         return verifNeuroneC;
     }
 
+    // Entraînement hardcodé pour le sinus
     private static Complexe[][] hardcodeEntrainementSinus() {
         // Fusionner les signaux d'entraînement (hardcode pour l'instant)
         Complexe[][] entreeNeuroneC = listeTrain[1];
@@ -138,6 +143,7 @@ public class DetecteurDeSon2 {
         return verifNeuroneC;
     }
 
+    // Entraînement hardcodé pour un sinus V2
     private static Complexe[][] hardcodeEntrainementSinus2() {
         // Fusionner les signaux d'entraînement (hardcode pour l'instant)
         Complexe[][] entreeNeuroneC = listeTrain[2];
@@ -175,6 +181,7 @@ public class DetecteurDeSon2 {
     }
 
 
+    // Entraîner tous les neurones
     private static void entrainerTousLesNeurones() {
         for (int i = 0; i < neurones.length; i++) {
             int indexTrain1 = i; 
@@ -184,6 +191,7 @@ public class DetecteurDeSon2 {
         }
     }
 
+    // Lire les synapses et biais de tous les neurones
     private static void lireSynapseEtBiais() {
         for (int i = 0; i < neurones.length; i++) {
             if (neurones[i] instanceof Neurone) {
@@ -197,6 +205,7 @@ public class DetecteurDeSon2 {
             }
         }
     }
+
     // Initialisation des sons
     public static Son[] initFichierSon() {
         String[] cheminsFichiers = {
@@ -216,7 +225,7 @@ public class DetecteurDeSon2 {
         return sons;
     }
 
-
+    // Prédire sur un fichier donné
     private static void predireSurFichier(String nomFichier) {
         System.out.println("Lecture du fichier WAV " + nomFichier);
         Son sonToPredict = new Son(nomFichier);
@@ -243,7 +252,7 @@ public class DetecteurDeSon2 {
         System.out.println("Moyenne des sorties pour le neurone 2  avec "+50+" : " + moyenneSortiesNeurone2);
     }
     
-
+    // Effectuer la FFT pour un son
     private static Complexe[][] fftSur1Son(Son son, int nbBloc) {
         int tailleBloc = TAILLE_FFT;
         Complexe[][] fft = new Complexe[nbBloc][tailleBloc];
@@ -256,50 +265,71 @@ public class DetecteurDeSon2 {
         return fft;
     }
 
-    private static Complexe[] fftBloc(float[] bloc) {
-        Complexe[] signalComplexe = new Complexe[bloc.length];
-        for (int i = 0; i < bloc.length; i++) {
-            signalComplexe[i] = new ComplexeCartesien(bloc[i], 0);
-        }
-
-        return FFTCplx.appliqueSur(signalComplexe);
+    
+    // Effectuer la FFT sur un bloc de données
+private static Complexe[] fftBloc(float[] bloc) {
+    // Convertir le bloc de données en un tableau de nombres complexes
+    Complexe[] signalComplexe = new Complexe[bloc.length];
+    for (int i = 0; i < bloc.length; i++) {
+        signalComplexe[i] = new ComplexeCartesien(bloc[i], 0); // Créer un nombre complexe avec la partie imaginaire nulle
     }
 
-    private static void fftForAllSons(Son[] allSons, int[] nbBloc) {
-        for (int i = 0; i < allSons.length; i++) {
-            nbBloc[i] = allSons[i].donnees().length / TAILLE_FFT;
-            listeFFTGuess[i] = fftSur1Son(allSons[i], nbBloc[i]);
-        }
+    // Appliquer la FFT sur le tableau de nombres complexes
+    return FFTCplx.appliqueSur(signalComplexe);
+}
+
+// Effectuer la FFT pour tous les sons
+private static void fftForAllSons(Son[] allSons, int[] nbBloc) {
+    for (int i = 0; i < allSons.length; i++) {
+        // Calculer le nombre de blocs pour chaque son
+        nbBloc[i] = allSons[i].donnees().length / TAILLE_FFT;
+        // Effectuer la FFT sur chaque son et stocker les résultats
+        listeFFTGuess[i] = fftSur1Son(allSons[i], nbBloc[i]);
+    }
+}
+
+// Lire tous les blocs de taille fixe d'un signal
+public static Complexe[][] lireTousLesXBlocs(int tailleBloc, float[] donnees, double pourcentage) {
+    int tailleSignal = donnees.length;
+    // Calculer le nombre de blocs à extraire en fonction du pourcentage
+    int nombreTotalBlocs = (int) (tailleSignal / tailleBloc * pourcentage);
+    // Initialiser un tableau pour stocker tous les blocs de Complexe
+    Complexe[][] tousLesBlocs = new Complexe[nombreTotalBlocs][];
+
+    // Parcourir tous les blocs
+    for (int i = 0; i < nombreTotalBlocs; i++) {
+        // Lire chaque bloc de données
+        float[] bloc = bloc_deTaille(i, tailleBloc, donnees);
+        // Convertir chaque bloc en Complexe et l'ajouter au tableau
+        tousLesBlocs[i] = convertirEnComplexe(bloc);
     }
 
-    public static Complexe[][] lireTousLesXBlocs(int tailleBloc, float[] donnees, double pourcentage) {
-        int tailleSignal = donnees.length;
-        int nombreTotalBlocs = (int) (tailleSignal / tailleBloc * pourcentage); // Calculer le nombre de blocs à extraire
-        Complexe[][] tousLesBlocs = new Complexe[nombreTotalBlocs][]; // Initialiser un tableau pour stocker tous les blocs de Complexe
+    // Retourner tous les blocs de Complexe
+    return tousLesBlocs;
+}
 
-        // Parcourir tous les blocs
-        for (int i = 0; i < nombreTotalBlocs; i++) {
-            float[] bloc = bloc_deTaille(i, tailleBloc, donnees); // Lire chaque bloc
-            tousLesBlocs[i] = convertirEnComplexe(bloc); // Convertir chaque bloc en Complexe et l'ajouter au tableau
-        }
+// Lire un bloc de données d'une taille spécifiée
+public static float[] bloc_deTaille(final int numeroBloc, final int tailleBloc, float[] donnees) {
+    final int from = numeroBloc * tailleBloc; // Début du bloc
+    final int to = from + tailleBloc; // Fin du bloc
+    // Retourner une copie du bloc spécifié
+    return Arrays.copyOfRange(donnees, from, to);
+}
 
-        return tousLesBlocs; // Retourner tous les blocs de Complexe
+// Convertir un bloc de données en nombres complexes
+public static Complexe[] convertirEnComplexe(float[] bloc) {
+    // Initialiser un tableau de nombres complexes
+    Complexe[] signalComplexe = new Complexe[bloc.length];
+    for (int i = 0; i < bloc.length; i++) {
+        // Créer un nombre complexe pour chaque élément du bloc
+        signalComplexe[i] = new ComplexeCartesien(bloc[i], 0);
     }
+    // Retourner le tableau de nombres complexes
+    return signalComplexe;
+}
 
-    public static float[] bloc_deTaille(final int numeroBloc, final int tailleBloc, float[] donnees) {
-        final int from = numeroBloc * tailleBloc;
-        final int to = from + tailleBloc;
-        return Arrays.copyOfRange(donnees, from, to);
-    }
 
-    public static Complexe[] convertirEnComplexe(float[] bloc) {
-        Complexe[] signalComplexe = new Complexe[bloc.length];
-        for (int i = 0; i < bloc.length; i++) {
-            signalComplexe[i] = new ComplexeCartesien(bloc[i], 0);
-        }
-        return signalComplexe;
-    }
-
+    // Convertir la FFT en données d'entrée pour le réseau de neurones 
     private static float[][] convFFTtoEntree(Complexe[][] signalTrain, int nbBloc, int taille) {
         // Conversion de notre signal à notre entrée de neurone
         float[][] entrees = new float[nbBloc][taille];
@@ -311,6 +341,7 @@ public class DetecteurDeSon2 {
         return entrees;
     }
 
+    // Fusionner deux ensembles de données FFT
     public static Complexe[][] fusion(Complexe[][] matrice1, Complexe[][] matrice2) {
         int totalRows = matrice1.length + matrice2.length;
         int cols = matrice1[0].length;
@@ -327,6 +358,7 @@ public class DetecteurDeSon2 {
         return fusion;
     }
 
+    // Normaliser les données
     private static float[][] normaliserDonnees(float[][] donnees) {
         int n = donnees.length; // Nombre de lignes (nombre de vecteurs)
         int m = donnees[0].length; // Nombre de colonnes (nombre de caractéristiques par vecteur)
@@ -359,6 +391,7 @@ public class DetecteurDeSon2 {
         return normalisees;
     }
 
+    // Créer un tableau de résultats
     public static float[] creerTableau(int taille, int nbPositifs) {
         float[] tableau = new float[taille];
 
@@ -374,6 +407,7 @@ public class DetecteurDeSon2 {
         return tableau;
     }
 
+    // Prédire et afficher les résultats
     public static float prediction(Complexe[][] signalTrain, iNeurone nCarre, int nbBloc) {
         // Conversion de notre signal à notre entrée de neurone
         final int taille = signalTrain[0].length;
