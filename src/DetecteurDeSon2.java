@@ -50,6 +50,7 @@ public class DetecteurDeSon2 {
         hardcodeEntrainementSinus();
         hardcodeEntrainementSinus2();
         if (args.length > 0) {
+            
             predireSurFichier(args[0]);
         }
 
@@ -221,10 +222,27 @@ public class DetecteurDeSon2 {
         Son sonToPredict = new Son(nomFichier);
         int nbBlocPredict = sonToPredict.donnees().length / TAILLE_FFT;
         Complexe[][] signalToPredict = fftSur1Son(sonToPredict, nbBlocPredict);
-        prediction(signalToPredict, neurones[0], nbBlocPredict);
-        prediction(signalToPredict, neurones[1], nbBlocPredict);
-        prediction(signalToPredict, neurones[2], nbBlocPredict);
+    
+        float sommeSortiesNeurone0 = 0;
+        float sommeSortiesNeurone1 = 0;
+        float sommeSortiesNeurone2 = 0;
+    
+        for (int i = 0; i < 50; i++) {
+            System.out.println("Tour numéro " + i);
+            sommeSortiesNeurone0 += prediction(signalToPredict, neurones[0], nbBlocPredict);
+            sommeSortiesNeurone1 += prediction(signalToPredict, neurones[1], nbBlocPredict);
+            sommeSortiesNeurone2 += prediction(signalToPredict, neurones[2], nbBlocPredict);
+        }
+    
+        float moyenneSortiesNeurone0 = sommeSortiesNeurone0 / 50;
+        float moyenneSortiesNeurone1 = sommeSortiesNeurone1 / 50;
+        float moyenneSortiesNeurone2 = sommeSortiesNeurone2 / 50;
+    
+        System.out.println("Moyenne des sorties pour le neurone 0  avec "+50+" : " + moyenneSortiesNeurone0);
+        System.out.println("Moyenne des sorties pour le neurone 1  avec "+50+" : " + moyenneSortiesNeurone1);
+        System.out.println("Moyenne des sorties pour le neurone 2  avec "+50+" : " + moyenneSortiesNeurone2);
     }
+    
 
     private static Complexe[][] fftSur1Son(Son son, int nbBloc) {
         int tailleBloc = TAILLE_FFT;
