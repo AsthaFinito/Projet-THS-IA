@@ -64,12 +64,29 @@ public class DetecteurDeSon2 {
     }
 
     private static Complexe[][] entrainerEtPredirePour1Neurone(int indexTrain1, int indexTrain2,int indexNeurone) {
-        Complexe[][] entreeNeuroneC = fusion(listeTrain[indexTrain1], listeTrain[indexTrain2]);
+        // Fusionner les signaux d'entraînement (hardcode pour l'instant)
+        Complexe[][] entreeNeuroneC = listeTrain[indexTrain1];
+        int nombreDeFusions = 1;
+        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[indexTrain2]);
+        nombreDeFusions++;
+        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[indexTrain2 + 1]);
+        nombreDeFusions++;
+        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[indexTrain2 + 2]);
+        nombreDeFusions++;
+       
+        // Fusionner les signaux de vérification
         Complexe[][] verifNeuroneC = fusion(listeTest[indexTrain1], listeTest[indexTrain2]);
 
+        // Convertir les données d'entraînement en format approprié pour le neurone
         float[][] entreeNeuroneF = convFFTtoEntree(entreeNeuroneC, entreeNeuroneC.length, TAILLE_FFT);
         entreeNeuroneF = normaliserDonnees(entreeNeuroneF);
-        float[] resultat = creerTableau(entreeNeuroneF.length);
+
+        // Calculer les proportions pour le tableau de résultats
+        int taille = entreeNeuroneF.length;
+        int nbPositifs = taille / nombreDeFusions;
+
+        // Créer le tableau de résultats
+        float[] resultat = creerTableau(taille, nbPositifs);
 
         System.out.println(resultat.length);
         System.out.println(entreeNeuroneF.length);
@@ -109,8 +126,8 @@ public class DetecteurDeSon2 {
             "./Sources sonores/Carre.wav",
             "./Sources sonores/Sinusoide.wav",
             "./Sources sonores/Sinusoide2.wav",
-            "./Sources sonores/Sinusoide3Harmoniques.wav",
-            "./Sources sonores/Combinaison.wav",
+            //"./Sources sonores/Sinusoide3Harmoniques.wav",
+            //"./Sources sonores/Combinaison.wav",
             "./Sources sonores/Bruit.wav"
         };
 
@@ -246,20 +263,18 @@ public class DetecteurDeSon2 {
         return normalisees;
     }
 
-    public static float[] creerTableau(int taille) {
+    public static float[] creerTableau(int taille, int nbPositifs) {
         float[] tableau = new float[taille];
-        int moitie = taille / 2;
 
-        // Remplir la première moitié de 1.0f
-        for (int i = 0; i < moitie; i++) {
+        for (int i = 0; i < nbPositifs; i++) {
             tableau[i] = 1.0f;
         }
 
-        // Remplir la deuxième moitié de 0.0f
-        for (int i = moitie; i < taille; i++) {
+        for (int i = nbPositifs; i < taille; i++) {
             tableau[i] = 0.0f;
         }
 
+        System.out.println("Tableau créé avec " + nbPositifs + " positifs et " + (taille - nbPositifs) + " négatifs.");
         return tableau;
     }
 
