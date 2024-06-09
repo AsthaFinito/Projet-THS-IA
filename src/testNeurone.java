@@ -18,7 +18,7 @@ public class testNeurone
 		// On crée un neurone taillé pour apprendre la fonction ET
 		//final iNeurone n = new NeuroneHeaviside(entrees[0].length);
 		//System.out.println("Neurone iNeurone ok");
-		final iNeurone n = new NeuroneHeaviside(entrees[0].length);
+		final iNeurone n = new NeuroneRelu(entrees[0].length);
 		//final iNeurone n = new NeuroneReLU(entrees[0].length);
 		
 		// Ajouter du bruit aux entrées

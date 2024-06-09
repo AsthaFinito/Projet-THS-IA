@@ -66,7 +66,7 @@ public class DetecteurDeSon2 {
     private static void initialiserNeurones(int nombreDeNeurones, int tailleDesEntrees) {
         neurones = new iNeurone[nombreDeNeurones];
         for (int i = 0; i < nombreDeNeurones; i++) {
-            neurones[i] = new NeuroneHeaviside(tailleDesEntrees);
+            neurones[i] = new NeuroneSigmoid(tailleDesEntrees);
         }
     }
 
