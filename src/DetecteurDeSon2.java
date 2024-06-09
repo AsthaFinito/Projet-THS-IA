@@ -52,6 +52,7 @@ public class DetecteurDeSon2 {
         Complexe[][] verifNeuroneC = entrainerEtPredirePour1Neurone(0, 1, 0);
         hardcodeEntrainementSinus();
         hardcodeEntrainementSinus2();
+        hardcodeEntrainementSinus3();
         if (args.length > 0) {
             
             predireSurFichier(args[0]);
@@ -72,13 +73,15 @@ public class DetecteurDeSon2 {
     // Entraîner et prédire pour un neurone donné
     private static Complexe[][] entrainerEtPredirePour1Neurone(int indexTrain1, int indexTrain2,int indexNeurone) {
         // Fusionner les signaux d'entraînement (hardcode pour l'instant)
-        Complexe[][] entreeNeuroneC = listeTrain[indexTrain1];
+        Complexe[][] entreeNeuroneC = listeTrain[0];
         int nombreDeFusions = 1;
-        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[indexTrain2]);
+        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[1]);
         nombreDeFusions++;
-        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[indexTrain2 + 1]);
+        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[2]);
         nombreDeFusions++;
-        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[indexTrain2 + 2]);
+        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[3]);
+        nombreDeFusions++;
+        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[4]);
         nombreDeFusions++;
         
        
@@ -117,7 +120,8 @@ public class DetecteurDeSon2 {
         nombreDeFusions++;
         entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[3]);
         nombreDeFusions++;
-        
+        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[4]);
+        nombreDeFusions++;
        
         // Fusionner les signaux de vérification
         Complexe[][] verifNeuroneC = fusion(listeTest[1], listeTest[3]);
@@ -154,7 +158,8 @@ public class DetecteurDeSon2 {
         nombreDeFusions++;
         entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[3]);
         nombreDeFusions++;
-        
+        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[4]);
+        nombreDeFusions++;
        
         // Fusionner les signaux de vérification
         Complexe[][] verifNeuroneC = fusion(listeTest[1], listeTest[3]);
@@ -179,7 +184,45 @@ public class DetecteurDeSon2 {
         prediction(verifNeuroneC, neurones[2], verifNeuroneC.length);
         return verifNeuroneC;
     }
+    private static Complexe[][] hardcodeEntrainementSinus3() {
+        // Fusionner les signaux d'entraînement (hardcode pour l'instant)
+        Complexe[][] entreeNeuroneC = listeTrain[3];
+        int nombreDeFusions = 1;
+        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[0]);
+        nombreDeFusions++;
+        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[1]);
+        nombreDeFusions++;
+        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[2]);
+        nombreDeFusions++;
+        entreeNeuroneC = fusion(entreeNeuroneC, listeTrain[4]);
+        nombreDeFusions++;
+        
+       
+        // Fusionner les signaux de vérification
+        Complexe[][] verifNeuroneC = fusion(listeTest[1], listeTest[3]);
 
+        // Convertir les données d'entraînement en format approprié pour le neurone
+        float[][] entreeNeuroneF = convFFTtoEntree(entreeNeuroneC, entreeNeuroneC.length, TAILLE_FFT);
+        entreeNeuroneF = normaliserDonnees(entreeNeuroneF);
+
+        // Calculer les proportions pour le tableau de résultats
+        int taille = entreeNeuroneF.length;
+        int nbPositifs = taille / nombreDeFusions;
+
+        // Créer le tableau de résultats
+        float[] resultat = creerTableau(taille, nbPositifs);
+
+        System.out.println(resultat.length);
+        System.out.println(entreeNeuroneF.length);
+        System.out.println("Nombre de tours : " + neurones[3].apprentissage(entreeNeuroneF, resultat));
+
+        //lireSynapseEtBiais();
+
+        prediction(verifNeuroneC, neurones[3], verifNeuroneC.length);
+        return verifNeuroneC;
+    }
+
+    
 
     // Entraîner tous les neurones
     private static void entrainerTousLesNeurones() {
@@ -212,7 +255,7 @@ public class DetecteurDeSon2 {
             "./Sources sonores/Carre.wav",
             "./Sources sonores/Sinusoide.wav",
             "./Sources sonores/Sinusoide2.wav",
-            //"./Sources sonores/Sinusoide3Harmoniques.wav",
+            "./Sources sonores/Sinusoide3Harmoniques.wav",
             //"./Sources sonores/Combinaison.wav",
             "./Sources sonores/Bruit.wav"
         };
@@ -235,21 +278,23 @@ public class DetecteurDeSon2 {
         float sommeSortiesNeurone0 = 0;
         float sommeSortiesNeurone1 = 0;
         float sommeSortiesNeurone2 = 0;
-    
+        float sommeSortiesNeurone3 = 0;
         for (int i = 0; i < 50; i++) {
             System.out.println("Tour numéro " + i);
             sommeSortiesNeurone0 += prediction(signalToPredict, neurones[0], nbBlocPredict);
             sommeSortiesNeurone1 += prediction(signalToPredict, neurones[1], nbBlocPredict);
             sommeSortiesNeurone2 += prediction(signalToPredict, neurones[2], nbBlocPredict);
+            sommeSortiesNeurone3 += prediction(signalToPredict, neurones[3], nbBlocPredict);
         }
     
         float moyenneSortiesNeurone0 = sommeSortiesNeurone0 / 50;
         float moyenneSortiesNeurone1 = sommeSortiesNeurone1 / 50;
         float moyenneSortiesNeurone2 = sommeSortiesNeurone2 / 50;
-    
+        float moyenneSortiesNeurone3 = sommeSortiesNeurone3 / 50;
         System.out.println("Moyenne des sorties pour le neurone 0  avec "+50+" : " + moyenneSortiesNeurone0);
         System.out.println("Moyenne des sorties pour le neurone 1  avec "+50+" : " + moyenneSortiesNeurone1);
         System.out.println("Moyenne des sorties pour le neurone 2  avec "+50+" : " + moyenneSortiesNeurone2);
+        System.out.println("Moyenne des sorties pour le neurone 3  avec "+50+" : " + moyenneSortiesNeurone3);
     }
     
     // Effectuer la FFT pour un son
